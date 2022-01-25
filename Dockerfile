@@ -1,5 +1,2 @@
-FROM ubuntu
-
-RUN echo "Hello World"
-
-RUN apt update
+FROM nginx
+ADD html /usr/share/nginx/html 

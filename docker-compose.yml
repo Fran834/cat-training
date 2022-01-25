@@ -1,0 +1,36 @@
+version:  "3.8"
+
+services:
+
+  nginx:
+    image: nginx:1.21.5
+    ports:
+      - ${INGINX_PORT:-8080}:80
+    volumes:
+      - ./html:/usr/share/nginx/html:ro
+
+  postgres:
+    image: postgres:14.1    
+    #volumes:
+    #  - ./.docker-data/pg:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}    
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  adminer:
+    image: adminer:4.7
+    links:
+      - postgres:db
+    ports:
+      - "${ADMINER_PORT:-8008}:8080"    
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+networks:
+  hasuraproject:
+    driver: bridge
